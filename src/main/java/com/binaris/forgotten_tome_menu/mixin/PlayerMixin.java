@@ -1,6 +1,10 @@
 package com.binaris.forgotten_tome_menu.mixin;
 
+import com.binaris.forgotten_tome_menu.ForgottenTomeMod;
 import com.binaris.forgotten_tome_menu.TeleportingState;
+import com.binaris.forgotten_tome_menu.network.ForgottenTomePacket;
+import com.binaris.forgotten_tome_menu.network.NetworkHandler;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -30,20 +34,30 @@ public abstract class PlayerMixin implements TeleportingState {
             }
 
             if(!player.blockPosition().equals(originalPos)){
-                player.sendSystemMessage(Component.literal("You can't move while teleporting!"));
+                player.displayClientMessage(Component.literal("You can't move while teleporting!").withStyle(ChatFormatting.RED), true);
                 isTeleporting = false;
                 teleportTicks = 0;
                 originalPos = null;
                 return;
             }
+
+            if(ForgottenTomeMod.damageGroup.containsKey(player.getUUID())){
+                if(player.level.getGameTime() - ForgottenTomeMod.damageGroup.get(player.getUUID()) <= 600){
+                    player.displayClientMessage(Component.literal("You can't teleport while in combat!").withStyle(ChatFormatting.RED), true);
+                    isTeleporting = false;
+                    teleportTicks = 0;
+                    originalPos = null;
+                    return;
+                }
+            }
             teleportTicks++;
-            player.sendSystemMessage(Component.literal("Teleporting... " + teleportTicks));
+            player.displayClientMessage(Component.literal("Teleporting... ").withStyle(ChatFormatting.GREEN), true);
             if(teleportTicks >= 100){
-                player.sendSystemMessage(Component.literal("Teleported!"));
+                player.displayClientMessage(Component.literal("Teleported!").withStyle(ChatFormatting.GREEN), true);
                 originalPos = null;
                 isTeleporting = false;
                 teleportTicks = 0;
-                // TODO: TELEPORT
+                NetworkHandler.sendToServer(new ForgottenTomePacket());
             }
         }
     }

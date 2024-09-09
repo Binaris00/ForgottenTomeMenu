@@ -5,5 +5,6 @@ import net.minecraft.resources.ResourceLocation;
 
 public class ForgottenButtonHandler {
     public static final ResourceLocation BUTTON_TEXTURE = new ResourceLocation(ForgottenTomeMod.MODID, "textures/gui/button.png");
+    public static final ResourceLocation CANCEL_BUTTON_TEXTURE = new ResourceLocation(ForgottenTomeMod.MODID, "textures/gui/cancel_button.png");
     public static ImageButton bookButton;
 }

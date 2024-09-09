@@ -8,17 +8,15 @@ import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 @Mod.EventBusSubscriber(modid = ForgottenTomeMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ConfigClient {
-
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
     private static final ForgeConfigSpec.IntValue BOOK_BUTTON_X = BUILDER
             .comment("Button X position")
-            .defineInRange("book_button_x", 110, -500, 500);
+            .defineInRange("book_button_x", 130, -500, 500);
 
     private static final ForgeConfigSpec.IntValue BOOK_BUTTON_Y = BUILDER
             .comment("Button Y position")
             .defineInRange("book_button_y", 61, -500, 500);
-
 
     public static int button_x;
     public static int button_y;

@@ -1,8 +1,5 @@
 package com.binaris.forgotten_tome_menu.network;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.TicketType;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.resources.ResourceLocation;
@@ -10,6 +7,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -27,23 +25,14 @@ public record ForgottenTomePacket() {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player == null || player.level.isClientSide) return;
-
-            ResourceLocation rl = new ResourceLocation("beyondtheend", "the_forgotten_realm");
-            ResourceKey<Level> key = ResourceKey.create(Registry.DIMENSION_REGISTRY, rl);
-            ServerLevel target = player.server.getLevel(key);
-            if (target == null) {
-                target = player.server.getLevel(Level.OVERWORLD);
+            ResourceKey<Level> key = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation("ender_journey", "the_forgotten_realm"));
+            ServerLevel dimension = player.server.getLevel(key);
+            Vec3 tpPos = new Vec3(0.5F,142.0F,0.5F);
+            if (dimension == null) {
+                dimension = player.server.getLevel(Level.OVERWORLD);
+                tpPos = Vec3.atCenterOf(dimension.getSharedSpawnPos());
             }
-
-            // Coordenadas fijas
-            double x = 0.5D;
-            double y = 142.0D;
-            double z = 0.5D;
-
-            ChunkPos cpos = new ChunkPos(0 >> 4, 0 >> 4);
-            target.getChunkSource().addRegionTicket(TicketType.POST_TELEPORT, cpos, 1, player.getId());
-
-            player.teleportTo(target, x, y, z, player.getYRot(), player.getXRot());
+            player.teleportTo(dimension, tpPos.x, tpPos.y, tpPos.z, player.getYRot(), player.getXRot());
         });
         ctx.get().setPacketHandled(true);
 }

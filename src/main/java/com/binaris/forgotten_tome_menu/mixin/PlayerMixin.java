@@ -16,25 +16,35 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Player.class)
 public abstract class PlayerMixin implements TeleportingState {
+
     @Unique
     int teleportTicks = 0;
+
     @Unique
     boolean isTeleporting = false;
+
     @Unique
     BlockPos originalPos = null;
+
     @Unique
     Player player = (Player)(Object)this;
 
 
     @Inject(method = "tick", at = @At("HEAD"))
     public void forgotten_tome_tick(CallbackInfo ci){
+
         if(forgottenTomeMenu$isTeleporting()){
+
             if(originalPos == null){
                 originalPos = player.blockPosition();
             }
 
             if(!player.blockPosition().equals(originalPos)){
-                player.displayClientMessage(Component.literal("You can't move while teleporting!").withStyle(ChatFormatting.RED), true);
+                player.displayClientMessage(
+                        Component.translatable("forgotten_tome.teleport.move_blocked")
+                                .withStyle(ChatFormatting.RED),
+                        true
+                );
                 isTeleporting = false;
                 teleportTicks = 0;
                 originalPos = null;
@@ -43,20 +53,37 @@ public abstract class PlayerMixin implements TeleportingState {
 
             if(ForgottenTomeMod.damageGroup.containsKey(player.getUUID())){
                 if(player.level.getGameTime() - ForgottenTomeMod.damageGroup.get(player.getUUID()) <= 600){
-                    player.displayClientMessage(Component.literal("You can't teleport while in combat!").withStyle(ChatFormatting.RED), true);
+                    player.displayClientMessage(
+                            Component.translatable("forgotten_tome.teleport.combat_blocked")
+                                    .withStyle(ChatFormatting.RED),
+                            true
+                    );
                     isTeleporting = false;
                     teleportTicks = 0;
                     originalPos = null;
                     return;
                 }
             }
+
             teleportTicks++;
-            player.displayClientMessage(Component.literal("Teleporting... ").withStyle(ChatFormatting.GREEN), true);
+
+            player.displayClientMessage(
+                    Component.translatable("forgotten_tome.teleport.progress")
+                            .withStyle(ChatFormatting.GREEN),
+                    true
+            );
+
             if(teleportTicks >= 100){
-                player.displayClientMessage(Component.literal("Teleported!").withStyle(ChatFormatting.GREEN), true);
+                player.displayClientMessage(
+                        Component.translatable("forgotten_tome.teleport.success")
+                                .withStyle(ChatFormatting.GREEN),
+                        true
+                );
+
                 originalPos = null;
                 isTeleporting = false;
                 teleportTicks = 0;
+
                 NetworkHandler.sendToServer(new ForgottenTomePacket());
             }
         }
@@ -71,7 +98,6 @@ public abstract class PlayerMixin implements TeleportingState {
     public boolean forgottenTomeMenu$isTeleporting() {
         return isTeleporting;
     }
-
 
     @Override
     public boolean forgottenTomeMenu$setTeleporting(boolean teleporting) {

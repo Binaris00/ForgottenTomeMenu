@@ -1,0 +1,6 @@
+{
+  "forgotten_tome.teleport.move_blocked": "¡No puedes moverte mientras te estás teletransportando!",
+  "forgotten_tome.teleport.combat_blocked": "¡No puedes teletransportarte mientras estás en combate!",
+  "forgotten_tome.teleport.progress": "Teletransportando...",
+  "forgotten_tome.teleport.success": "¡Teletransportado!"
+}

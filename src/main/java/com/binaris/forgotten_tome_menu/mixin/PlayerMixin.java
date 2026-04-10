@@ -5,8 +5,11 @@ import com.binaris.forgotten_tome_menu.TeleportingState;
 import com.binaris.forgotten_tome_menu.network.ForgottenTomePacket;
 import com.binaris.forgotten_tome_menu.network.NetworkHandler;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -29,9 +32,30 @@ public abstract class PlayerMixin implements TeleportingState {
     @Unique
     Player player = (Player)(Object)this;
 
+    @Unique
+    boolean wasInCombat = false;
+
 
     @Inject(method = "tick", at = @At("HEAD"))
     public void forgotten_tome_tick(CallbackInfo ci){
+
+        boolean isInCombat = ForgottenTomeMod.damageGroup.containsKey(player.getUUID())
+                && player.level.getGameTime() - ForgottenTomeMod.damageGroup.get(player.getUUID()) <= 600;
+
+        if (wasInCombat && !isInCombat && player.level.isClientSide) {
+            player.sendSystemMessage(
+                    Component.translatable("forgotten_tome.teleport.combat_ready")
+                            .withStyle(ChatFormatting.GREEN)
+            );
+            player.level.playLocalSound(
+                    player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.NOTE_BLOCK_PLING,
+                    SoundSource.PLAYERS,
+                    1.0F, 2.0F, false
+            );
+        }
+
+        wasInCombat = isInCombat;
 
         if(forgottenTomeMenu$isTeleporting()){
 

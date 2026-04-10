@@ -33,13 +33,26 @@ public abstract class InventoryScreenMixin<T extends AbstractContainerMenu> exte
             resourceLocation = ForgottenButtonHandler.BUTTON_TEXTURE;
         }
 
-        ForgottenButtonHandler.bookButton = new ImageButton(leftPos + ConfigClient.button_x, topPos + ConfigClient.button_y, 20, 18, 0, 0, 19, resourceLocation, clicked -> {
-            Minecraft minecraft1 = Minecraft.getInstance();
-
-            if(minecraft1.player != null){
-                ((TeleportingState) minecraft1.player).forgottenTomeMenu$setTeleporting(true);
-            }
-        });
+        ForgottenButtonHandler.bookButton = new ImageButton(
+                leftPos + ConfigClient.button_x, topPos + ConfigClient.button_y,
+                20, 18,
+                0, 0, 19,
+                resourceLocation,
+                256, 256,
+                clicked -> {
+                    Minecraft minecraft1 = Minecraft.getInstance();
+                    if (minecraft1.player != null) {
+                        ((TeleportingState) minecraft1.player).forgottenTomeMenu$setTeleporting(true);
+                    }
+                },
+                (button, stack, mouseX, mouseY) -> {
+                    if (Minecraft.getInstance().screen != null) {
+                        Minecraft.getInstance().screen.renderTooltip(stack,
+                                Component.translatable("forgotten_tome_menu.button.tooltip"), mouseX, mouseY);
+                    }
+                },
+                Component.translatable("forgotten_tome_menu.button.tooltip")
+        );
 
         ForgottenButtonHandler.bookButton.visible = true;
         this.addRenderableWidget(ForgottenButtonHandler.bookButton);

@@ -1,4 +1,6 @@
 {
+  "forgotten_tome.teleport.combat_ready": "You can teleport again!",
+  "forgotten_tome_menu.button.tooltip": "Teleport to The Forgotten Realm",
   "forgotten_tome.teleport.move_blocked": "You can't move while teleporting!",
   "forgotten_tome.teleport.combat_blocked": "You can't teleport while in combat!",
   "forgotten_tome.teleport.progress": "Teleporting...",

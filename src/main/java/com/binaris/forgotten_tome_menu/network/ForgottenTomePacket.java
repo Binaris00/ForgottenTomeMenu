@@ -27,12 +27,12 @@ public record ForgottenTomePacket() {
             if (player == null || player.level.isClientSide) return;
             ResourceKey<Level> key = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation("ender_journey", "the_forgotten_realm"));
             ServerLevel dimension = player.server.getLevel(key);
-            Vec3 tpPos = new Vec3(0.5F,142.0F,0.5F);
+            Vec3 tpPos = new Vec3(0.0, 79.0, 0.0);
             if (dimension == null) {
                 dimension = player.server.getLevel(Level.OVERWORLD);
                 tpPos = Vec3.atCenterOf(dimension.getSharedSpawnPos());
             }
-            player.teleportTo(dimension, tpPos.x, tpPos.y, tpPos.z, player.getYRot(), player.getXRot());
+            player.teleportTo(dimension, tpPos.x, tpPos.y, tpPos.z, 90.0F, 0.0F);
         });
         ctx.get().setPacketHandled(true);
 }

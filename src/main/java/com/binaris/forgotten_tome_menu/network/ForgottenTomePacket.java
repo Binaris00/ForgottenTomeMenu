@@ -27,7 +27,7 @@ public record ForgottenTomePacket() {
             if (player == null || player.level.isClientSide) return;
             ResourceKey<Level> key = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation("ender_journey", "the_forgotten_realm"));
             ServerLevel dimension = player.server.getLevel(key);
-            Vec3 tpPos = new Vec3(0.0, 126.0, 0.0);
+            Vec3 tpPos = new Vec3(0.0, 116.0, 0.0);
             if (dimension == null) {
                 dimension = player.server.getLevel(Level.OVERWORLD);
                 tpPos = Vec3.atCenterOf(dimension.getSharedSpawnPos());

@@ -8,6 +8,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
@@ -35,6 +36,10 @@ public abstract class PlayerMixin implements TeleportingState {
     @Unique
     boolean wasInCombat = false;
 
+    @Unique
+    private static final ResourceLocation FORGOTTEN_REALM_ID =
+            new ResourceLocation("ender_journey", "the_forgotten_realm");
+
 
     @Inject(method = "tick", at = @At("HEAD"))
     public void forgotten_tome_tick(CallbackInfo ci){
@@ -58,6 +63,23 @@ public abstract class PlayerMixin implements TeleportingState {
         wasInCombat = isInCombat;
 
         if(forgottenTomeMenu$isTeleporting()){
+
+            // Teleport instantáneo si el jugador ya está en The Forgotten Realm
+            boolean isInForgottenRealm = player.level.dimension().location()
+                    .equals(FORGOTTEN_REALM_ID);
+
+            if (isInForgottenRealm) {
+                player.displayClientMessage(
+                        Component.translatable("forgotten_tome.teleport.success")
+                                .withStyle(ChatFormatting.GREEN),
+                        true
+                );
+                originalPos = null;
+                isTeleporting = false;
+                teleportTicks = 0;
+                NetworkHandler.sendToServer(new ForgottenTomePacket());
+                return;
+            }
 
             if(originalPos == null){
                 originalPos = player.blockPosition();

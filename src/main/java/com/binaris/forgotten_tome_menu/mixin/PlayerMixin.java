@@ -5,7 +5,6 @@ import com.binaris.forgotten_tome_menu.TeleportingState;
 import com.binaris.forgotten_tome_menu.network.ForgottenTomePacket;
 import com.binaris.forgotten_tome_menu.network.NetworkHandler;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -39,6 +38,44 @@ public abstract class PlayerMixin implements TeleportingState {
     @Unique
     private static final ResourceLocation FORGOTTEN_REALM_ID =
             new ResourceLocation("ender_journey", "the_forgotten_realm");
+
+    @Unique
+    private static final int TOTAL_TICKS = 100;
+
+    @Unique
+    private static final int BAR_LENGTH = 20;
+
+    @Unique
+    private static final char FILLED_CHAR  = '█';
+
+    @Unique
+    private static final char EMPTY_CHAR   = '░';
+
+
+    @Unique
+    private Component buildProgressBar(int ticks) {
+        int filled = (int) Math.round((double) ticks / TOTAL_TICKS * BAR_LENGTH);
+        filled = Math.max(0, Math.min(filled, BAR_LENGTH));
+
+        StringBuilder bar = new StringBuilder("[");
+        for (int i = 0; i < BAR_LENGTH; i++) {
+            bar.append(i < filled ? FILLED_CHAR : EMPTY_CHAR);
+        }
+        bar.append("] ");
+        bar.append((int) Math.round((double) ticks / TOTAL_TICKS * 100));
+        bar.append("%");
+
+        return Component.literal("⬛ ")
+                .withStyle(ChatFormatting.DARK_GRAY)
+                .append(
+                    Component.translatable("forgotten_tome.teleport.progress")
+                        .withStyle(ChatFormatting.GREEN)
+                )
+                .append(
+                    Component.literal(" " + bar)
+                        .withStyle(ChatFormatting.GREEN)
+                );
+    }
 
 
     @Inject(method = "tick", at = @At("HEAD"))
@@ -113,13 +150,9 @@ public abstract class PlayerMixin implements TeleportingState {
 
             teleportTicks++;
 
-            player.displayClientMessage(
-                    Component.translatable("forgotten_tome.teleport.progress")
-                            .withStyle(ChatFormatting.GREEN),
-                    true
-            );
+            player.displayClientMessage(buildProgressBar(teleportTicks), true);
 
-            if(teleportTicks >= 100){
+            if(teleportTicks >= TOTAL_TICKS){
                 player.displayClientMessage(
                         Component.translatable("forgotten_tome.teleport.success")
                                 .withStyle(ChatFormatting.GREEN),
